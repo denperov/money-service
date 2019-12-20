@@ -179,34 +179,35 @@ func (r *postgresRepository) AddTransfer(ctx context.Context, transfer service.T
 		}
 	}()
 
+	row := r.pool.QueryRow(ctx, queryAddTransferCheckAccounts, transfer.FromAccount, transfer.ToAccount)
+
 	var currencyFrom sql.NullString
 	var currencyTo sql.NullString
-	row := r.pool.QueryRow(ctx, queryAddTransferCheckAccounts, transfer.FromAccount, transfer.ToAccount)
 	err = row.Scan(&currencyFrom, &currencyTo)
 	if err != nil {
 		return err
 	}
 	if !currencyFrom.Valid {
-		return user_errors.New("source account not exists")
+		return user_errors.ErrorWrongSourceAccount
 	}
 	if !currencyTo.Valid {
-		return user_errors.New("destination account not exists")
+		return user_errors.ErrorWrongDestinationAccount
 	}
 	if currencyFrom != currencyTo {
-		return user_errors.New("accounts have different currencies")
+		return user_errors.ErrorDifferentCurrencies
 	}
 
 	_, err = tx.Exec(ctx, queryAddTransferInsert, transfer.FromAccount, transfer.ToAccount, transfer.Amount)
 	if err != nil {
 		if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.ConstraintName == "positive_amount" {
-			return user_errors.New("zero payment")
+			return user_errors.ErrorWrongAmount
 		}
 		return err
 	}
 	_, err = tx.Exec(ctx, queryAddTransferUpdateFrom, transfer.FromAccount, transfer.Amount)
 	if err != nil {
 		if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.ConstraintName == "positive_balance" {
-			return user_errors.New("not enough money")
+			return user_errors.ErrorNotEnoughMoney
 		}
 		return err
 	}

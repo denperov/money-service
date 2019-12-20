@@ -71,7 +71,7 @@ var errorEncoderOption = httptransport.ServerErrorEncoder(encodeError)
 
 func encodeError(_ context.Context, serverError error, w http.ResponseWriter) {
 	var errorText string
-	if _, ok := serverError.(*user_errors.UserFriendlyError); ok {
+	if user_errors.IsUserFriendlyError(serverError) {
 		w.WriteHeader(http.StatusBadRequest)
 		errorText = serverError.Error()
 	} else {
