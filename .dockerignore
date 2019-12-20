@@ -1,0 +1,13 @@
+.git
+.idea
+
+.dockerignore
+.editorconfig
+.gitignore
+
+docker-compose*
+Dockerfile*
+Makefile*
+
+README.md
+docs

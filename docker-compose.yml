@@ -1,0 +1,53 @@
+---
+version: "3.6"
+
+services:
+  accounts:
+    image: denperov/accounts-service:dev
+    build:
+      context: .
+      dockerfile: ./cmd/accounts/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      API_LISTEN_ADDRESS: 0.0.0.0:8080
+      DATABASE_ADDRESS: accounts-db
+      DATABASE_NAME: accounts
+      DATABASE_USER: accounts
+      DATABASE_PASSWORD: accounts
+    networks:
+      - api-net
+      - db-net
+    depends_on:
+      - accounts-db
+
+  accounts-db:
+    image: postgres:12.1-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: accounts
+      POSTGRES_USER: accounts
+      POSTGRES_PASSWORD: accounts
+    volumes:
+      - ./db-init/accounts/init.sql:/docker-entrypoint-initdb.d/00_init.sql:ro
+      - ./test/accounts/test_data_alice_and_bob.sql:/docker-entrypoint-initdb.d/01_data.sql:ro
+      - ./test/accounts/test_data.sql:/docker-entrypoint-initdb.d/02_data.sql:ro
+    networks:
+      - db-net
+
+  accounts-test:
+    image: denperov/accounts-service-test:dev
+    build:
+      context: .
+      dockerfile: ./test/accounts/Dockerfile
+    environment:
+      SERVICE_API_URL: http://accounts:8080
+    networks:
+      - api-net
+    depends_on:
+      - accounts
+
+networks:
+  api-net:
+  db-net:
