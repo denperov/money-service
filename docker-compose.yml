@@ -9,12 +9,13 @@ services:
       dockerfile: ./cmd/accounts/Dockerfile
     ports:
       - "8080:8080"
-    environment:
-      API_LISTEN_ADDRESS: 0.0.0.0:8080
-      DATABASE_ADDRESS: accounts-db
-      DATABASE_NAME: accounts
-      DATABASE_USER: accounts
-      DATABASE_PASSWORD: accounts
+    command: [
+      "--listen-address",    "0.0.0.0:8080",
+      "--database-address",  "accounts-db",
+      "--database-name",     "accounts",
+      "--database-user",     "accounts",
+      "--database-password", "accounts"
+    ]
     networks:
       - api-net
       - db-net

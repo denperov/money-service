@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
 
@@ -9,16 +10,24 @@ import (
 	"github.com/denperov/money-service/internal/accounts/handlers"
 	"github.com/denperov/money-service/internal/accounts/repository/postgres_repository"
 	"github.com/denperov/money-service/internal/accounts/service"
-	"github.com/denperov/money-service/internal/pkg/configs"
 	"github.com/denperov/money-service/internal/pkg/http_server"
 	"github.com/denperov/money-service/internal/pkg/stop_signal"
 )
 
+var (
+	cfgListenAddress = flag.String("listen-address", "0.0.0.0:8080", "API listen address")
+
+	cfgDatabaseAddress  = flag.String("database-address", "", "Database address")
+	cfgDatabaseName     = flag.String("database-name", "", "Database name")
+	cfgDatabaseUser     = flag.String("database-user", "", "Database user")
+	cfgDatabasePassword = flag.String("database-password", "", "Database password")
+)
+
 func main() {
+	flag.Parse()
+
 	log.Println("accounts service: start")
 	defer log.Println("accounts service: stop")
-
-	var cfg Config
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -31,12 +40,11 @@ func main() {
 
 	// REPOSITORY
 
-	configs.MustReadConfig(&cfg.Database)
 	rep := postgres_repository.New(
-		cfg.Database.Address,
-		cfg.Database.Name,
-		cfg.Database.User,
-		cfg.Database.Password,
+		*cfgDatabaseAddress,
+		*cfgDatabaseName,
+		*cfgDatabaseUser,
+		*cfgDatabasePassword,
 	)
 
 	// SERVICE
@@ -52,9 +60,8 @@ func main() {
 
 	// SERVER
 
-	configs.MustReadConfig(&cfg.API)
 	server := http_server.New(
-		cfg.API.ListenAddress,
+		*cfgListenAddress,
 		mux,
 	)
 

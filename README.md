@@ -39,10 +39,6 @@ docker run -it --rm --network=host postgres:12.1-alpine sh -c "PGPASSWORD=accoun
 ## API
 [API description](docs/accounts/api.md)
 
-## Packages
-
-Package "github.com/caarlos0/env" is used to get parameters from environment variables, since this is a more common way for services running inside docker containers. It can be replaced with any other convenient package.
-
 ## Graceful shutdown
 
 Service supports graceful shutdown with sequential shutdown of components
