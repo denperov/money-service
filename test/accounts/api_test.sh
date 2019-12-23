@@ -89,6 +89,12 @@ echo Transfer more money than there is on the account
 api_post "/transfers" '{"transfer":{"from_account":"usd08","to_account":"usd09","amount":"100.01"}}'
 assert_user_error
 
+# Same account
+echo ------------------------------------------------------------------------------
+echo Transfer monye
+api_post "/transfers" '{"transfer":{"from_account":"usd01","to_account":"usd01","amount":"12.34"}}'
+assert_user_error
+
 # Nonexistent source account
 echo ------------------------------------------------------------------------------
 echo Transfer monye

@@ -41,8 +41,4 @@ docker run -it --rm --network=host postgres:12.1-alpine sh -c "PGPASSWORD=accoun
 
 ## Graceful shutdown
 
-Service supports graceful shutdown with sequential shutdown of components
-
-## Remark
-
-To work with money in golang code, a slightly unusual data type is selected, but in the current example they are only passed to the API, and this is better than a float.
+The service supports graceful shutdown with sequential shutdown of components
