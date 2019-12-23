@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/denperov/money-service/internal/accounts/service"
+	"github.com/denperov/money-service/internal/accounts/models"
 	"github.com/denperov/money-service/internal/pkg/user_errors"
 )
 
@@ -83,14 +83,14 @@ select
 from accounts;
 `
 
-func (r *postgresRepository) GetAccounts(ctx context.Context) ([]service.Account, error) {
+func (r *postgresRepository) GetAccounts(ctx context.Context) ([]models.Account, error) {
 	rows, err := r.pool.Query(ctx, queryGetAccounts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var accounts []service.Account
+	var accounts []models.Account
 	for rows.Next() {
 		select {
 		case <-ctx.Done(): // cancellation
@@ -98,7 +98,7 @@ func (r *postgresRepository) GetAccounts(ctx context.Context) ([]service.Account
 		default:
 		}
 
-		var account service.Account
+		var account models.Account
 		err = rows.Scan(&account.ID, &account.Currency, &account.Balance)
 		if err != nil {
 			return nil, err
@@ -118,14 +118,14 @@ join accounts af on af.id = t.account_from
 join accounts at on at.id = t.account_to;
 `
 
-func (r *postgresRepository) GetTransfers(ctx context.Context) ([]service.Transfer, error) {
+func (r *postgresRepository) GetTransfers(ctx context.Context) ([]models.Transfer, error) {
 	rows, err := r.pool.Query(ctx, queryGetPayments)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var transfers []service.Transfer
+	var transfers []models.Transfer
 	for rows.Next() {
 		select {
 		case <-ctx.Done(): // cancellation
@@ -133,7 +133,7 @@ func (r *postgresRepository) GetTransfers(ctx context.Context) ([]service.Transf
 		default:
 		}
 
-		var transfer service.Transfer
+		var transfer models.Transfer
 		err = rows.Scan(&transfer.FromAccount, &transfer.ToAccount, &transfer.Amount)
 		if err != nil {
 			return nil, err
@@ -165,7 +165,7 @@ set balance = balance + $2::numeric(13,2)
 where public_id = $1;
 `
 
-func (r *postgresRepository) AddTransfer(ctx context.Context, transfer service.Transfer) (err error) {
+func (r *postgresRepository) AddTransfer(ctx context.Context, transfer models.Transfer) (err error) {
 	tx, err := r.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.ReadCommitted, AccessMode: pgx.ReadWrite})
 	if err != nil {
 		return fmt.Errorf("begin database transaction: %w", err)
