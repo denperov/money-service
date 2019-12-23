@@ -4,8 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
-	"syscall"
 
 	"github.com/denperov/money-service/internal/accounts/endpoints"
 	"github.com/denperov/money-service/internal/accounts/handlers"
@@ -13,7 +11,7 @@ import (
 	"github.com/denperov/money-service/internal/accounts/service"
 	"github.com/denperov/money-service/internal/pkg/configs"
 	"github.com/denperov/money-service/internal/pkg/http_server"
-	"github.com/denperov/money-service/internal/pkg/signals_waiter"
+	"github.com/denperov/money-service/internal/pkg/stop_signal"
 )
 
 func main() {
@@ -22,16 +20,14 @@ func main() {
 
 	var cfg Config
 
-	// STOP SIGNAL
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go func() {
-		sig := signals_waiter.Wait(ctx, []os.Signal{syscall.SIGTERM, syscall.SIGINT})
-		log.Printf("received signal %s", sig)
-		cancel()
-	}()
+	// STOP SIGNAL
+
+	stopSignal := stop_signal.New(
+		cancel,
+	)
 
 	// REPOSITORY
 
@@ -63,6 +59,9 @@ func main() {
 	)
 
 	// RUN
+
+	stopSignal.Start(ctx)
+	defer stopSignal.Stop()
 
 	err := rep.Start(ctx)
 	if err != nil {
