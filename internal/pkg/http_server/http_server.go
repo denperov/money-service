@@ -8,16 +8,14 @@ import (
 )
 
 type server struct {
-	mux *http.ServeMux
 	srv *http.Server
 }
 
-func New(address string, mux *http.ServeMux) *server {
+func New(address string, handler http.Handler) *server {
 	return &server{
-		mux: mux,
 		srv: &http.Server{
 			Addr:    address,
-			Handler: mux,
+			Handler: handler,
 		},
 	}
 }

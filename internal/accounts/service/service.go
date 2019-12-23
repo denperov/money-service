@@ -15,7 +15,7 @@ type Repository interface {
 type AccountsService interface {
 	GetAccounts(context.Context) ([]models.Account, error)
 	GetPayments(context.Context) ([]models.Payment, error)
-	SendPayment(context.Context, models.Transfer) error
+	CreateTransfer(context.Context, models.Transfer) error
 }
 
 func New(
@@ -59,6 +59,6 @@ func (s *accountsService) GetPayments(ctx context.Context) ([]models.Payment, er
 	return payments, nil
 }
 
-func (s *accountsService) SendPayment(ctx context.Context, transfer models.Transfer) error {
+func (s *accountsService) CreateTransfer(ctx context.Context, transfer models.Transfer) error {
 	return s.repository.AddTransfer(ctx, transfer)
 }

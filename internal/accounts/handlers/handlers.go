@@ -30,33 +30,26 @@ func MakeGetPaymentsHandler(e endpoint.Endpoint) *httptransport.Server {
 		errorEncoderOption,
 	)
 }
-func MakeSendPaymentHandler(e endpoint.Endpoint) *httptransport.Server {
+
+func MakeCreateTransferHandler(e endpoint.Endpoint) *httptransport.Server {
 	return httptransport.NewServer(
 		e,
-		decodeSendPaymentRequest,
+		decodeCreateTransferRequest,
 		encodeResponse,
 		errorEncoderOption,
 	)
 }
 
 func decodeGetAccountsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request endpoints.GetAccountsRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		return nil, err
-	}
-	return request, nil
+	return endpoints.GetAccountsRequest{}, nil
 }
 
 func decodeGetPaymentsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request endpoints.GetPaymentsRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		return nil, err
-	}
-	return request, nil
+	return endpoints.GetPaymentsRequest{}, nil
 }
 
-func decodeSendPaymentRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request endpoints.SendPaymentRequest
+func decodeCreateTransferRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request endpoints.CreateTransferRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}

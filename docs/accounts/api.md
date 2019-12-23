@@ -2,7 +2,7 @@
 
 ### Get available accounts
 ```shell script
-curl -XPOST localhost:8080/get_accounts -d '{}'
+curl -X GET localhost:8080/accounts
 ```
 response:
 ```json
@@ -24,7 +24,7 @@ response:
 
 ### Get all payments
 ```shell script
-curl -XPOST localhost:8080/get_payments -d '{}'
+curl -X GET localhost:8080/payments
 ```
 response:
 ```json
@@ -48,7 +48,7 @@ response:
 
 ### Send payment
 ```shell script
-curl -XPOST localhost:8080/send_payment -d '{"transfer":{"from_account":"bob123","to_account":"alice456","amount":"100.01"}}'
+curl -X POST localhost:8080/transfers -d '{"transfer":{"from_account":"bob123","to_account":"alice456","amount":"100.01"}}'
 ```
 response:
 ```json
@@ -59,7 +59,7 @@ response:
 #### No errors
 HTTP code: 200
 
-The client receives a response for method.
+The client receives a response from method.
 
 #### User errors
 HTTP code: 400

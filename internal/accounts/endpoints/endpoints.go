@@ -45,19 +45,19 @@ func MakeGetPaymentsEndpoint(s service.AccountsService) endpoint.Endpoint {
 	}
 }
 
-type SendPaymentRequest struct {
+type CreateTransferRequest struct {
 	models.Transfer `json:"transfer"`
 }
 
-type SendPaymentResponse struct{}
+type CreateTransferResponse struct{}
 
-func MakeSendPaymentEndpoint(s service.AccountsService) endpoint.Endpoint {
+func MakeCreateTransferEndpoint(s service.AccountsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(SendPaymentRequest)
-		err := s.SendPayment(ctx, req.Transfer)
+		req := request.(CreateTransferRequest)
+		err := s.CreateTransfer(ctx, req.Transfer)
 		if err != nil {
 			return nil, err
 		}
-		return SendPaymentResponse{}, nil
+		return CreateTransferResponse{}, nil
 	}
 }

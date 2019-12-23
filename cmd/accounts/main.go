@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"log"
-	"net/http"
 
 	"github.com/denperov/money-service/internal/accounts/endpoints"
 	"github.com/denperov/money-service/internal/accounts/handlers"
@@ -12,6 +11,8 @@ import (
 	"github.com/denperov/money-service/internal/accounts/service"
 	"github.com/denperov/money-service/internal/pkg/http_server"
 	"github.com/denperov/money-service/internal/pkg/stop_signal"
+
+	"github.com/gorilla/mux"
 )
 
 var (
@@ -53,16 +54,22 @@ func main() {
 
 	// ENDPOINTS AND HANDLERS
 
-	mux := http.NewServeMux()
-	mux.Handle("/get_accounts", handlers.MakeGetAccountsHandler(endpoints.MakeGetAccountsEndpoint(svc)))
-	mux.Handle("/get_payments", handlers.MakeGetPaymentsHandler(endpoints.MakeGetPaymentsEndpoint(svc)))
-	mux.Handle("/send_payment", handlers.MakeSendPaymentHandler(endpoints.MakeSendPaymentEndpoint(svc)))
+	r := mux.NewRouter()
+	r.Methods("GET").Path("/accounts").Handler(
+		handlers.MakeGetAccountsHandler(endpoints.MakeGetAccountsEndpoint(svc)),
+	)
+	r.Methods("GET").Path("/payments").Handler(
+		handlers.MakeGetPaymentsHandler(endpoints.MakeGetPaymentsEndpoint(svc)),
+	)
+	r.Methods("POST").Path("/transfers").Handler(
+		handlers.MakeCreateTransferHandler(endpoints.MakeCreateTransferEndpoint(svc)),
+	)
 
 	// SERVER
 
 	server := http_server.New(
 		*cfgListenAddress,
-		mux,
+		r,
 	)
 
 	// RUN
