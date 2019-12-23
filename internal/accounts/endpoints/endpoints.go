@@ -5,13 +5,14 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 
+	"github.com/denperov/money-service/internal/accounts/models"
 	"github.com/denperov/money-service/internal/accounts/service"
 )
 
 type GetAccountsRequest struct{}
 
 type GetAccountsResponse struct {
-	Accounts []service.Account `json:"accounts"`
+	Accounts []models.Account `json:"accounts"`
 }
 
 func MakeGetAccountsEndpoint(s service.AccountsService) endpoint.Endpoint {
@@ -29,7 +30,7 @@ func MakeGetAccountsEndpoint(s service.AccountsService) endpoint.Endpoint {
 type GetPaymentsRequest struct{}
 
 type GetPaymentsResponse struct {
-	Payments []service.Payment `json:"payments"`
+	Payments []models.Payment `json:"payments"`
 }
 
 func MakeGetPaymentsEndpoint(s service.AccountsService) endpoint.Endpoint {
@@ -45,7 +46,7 @@ func MakeGetPaymentsEndpoint(s service.AccountsService) endpoint.Endpoint {
 }
 
 type SendPaymentRequest struct {
-	service.Transfer `json:"transfer"`
+	models.Transfer `json:"transfer"`
 }
 
 type SendPaymentResponse struct{}
